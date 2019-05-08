@@ -19,4 +19,8 @@ public class Utils {
     public String toCSV(Iterable<? extends CharSequence> iterable) {
         return String.join(",", iterable);
     }
+
+    public String toPrecision(double input) {
+        return String.format("%.1f", input);
+    }
 }

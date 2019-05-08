@@ -42,7 +42,7 @@
                             ∙
                             <span>#{movie.runtime} min</span>
                             ∙
-                            <span>#{movie.avgRating.intValue()}/5</span>
+                            <span>#{utils.toPrecision(movie.avgRating)}/5</span>
                             ∙
                             <span>#{movieService.findAllRatings(movie.id).size()} reviews</span>
                         </p>
