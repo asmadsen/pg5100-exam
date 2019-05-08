@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:sec="http://www.springframework.org/security/tags" xmlns:c="http://java.sun.com/jsp/jstl/core" xml:lang="en"
+      lang="en">
+<ui:composition template="../partials/layout.xhtml">
+    <!--@elvariable id="movie" type="no.asmadsen.exam.entity.Movie"-->
+    <ui:param name="movie" value="#{movieController.findById(param['id'])}"/>
+    <ui:define name="title">${movie.title}</ui:define>
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="id" value="#{ratingController.movieId}"/>
+            <f:viewParam name="editing" value="#{ratingController.editing}"/>
+            <f:viewAction action="#{ratingController.initEditing(userController.userId)}"/>
+        </f:metadata>
+        <div id="moviePage">
+            <ui:fragment rendered="#{movie == null}">
+                <div class="alert alert-danger">Could not find any movie with that id</div>
+            </ui:fragment>
+            <ui:fragment rendered="#{movie != null}">
+                <div class="row mx-0 align-items-center">
+                    <div class="col-md-4">
+                        <img src="#{movie.image}" class="card-img" alt="#{movie.title} movie poster"/>
+                    </div>
+                    <div class="col-md-8">
+                        <h1 class="display-4">#{movie.title}</h1>
+                        <div class="row mx-0 mb-2">
+                            <ui:repeat value="${movie.genres}" var="genre">
+                                <span class="badge badge-pill badge-primary mr-1">${genre}</span>
+                            </ui:repeat>
+                        </div>
+                        <p class="text-muted">
+                        <span>
+                            <h:outputText value="#{movie.released}"> <!-- actual value -->
+                                <!-- here we tell JSF how a java.util.Date object should be formatted -->
+                                <f:convertDateTime pattern="dd. MMMM yyyy"/>
+                            </h:outputText>
+                        </span>
+                            ∙
+                            <span>#{movie.director}</span>
+                            ∙
+                            <span>#{movie.runtime} min</span>
+                            ∙
+                            <span>#{movie.avgRating.intValue()}/5</span>
+                            ∙
+                            <span>#{movieService.findAllRatings(movie.id).size()} reviews</span>
+                        </p>
+                        <p class="lead">#{movie.plot}</p>
+                        <h:link id="rateMovieBtn" styleClass="btn btn-primary" value="Leave rating"
+                                rendered="#{!ratingController.isRatedByUser(userController.userId, movie.id)}"
+                                outcome="/movie.jsf?faces-redirect=true" includeViewParams="true">
+                            <f:param name="editing" value="true"/>
+                        </h:link>
+                    </div>
+                </div>
+                <sec:authenticated>
+                    <c:if test="#{param['editing']}">
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <h6 class="card-title">Rate this movie</h6>
+                                <h:form prependId="false">
+                                    <div class="form-group">
+                                        <label>Score</label>
+                                        <h:selectOneRadio id="score" required="true" value="#{ratingController.score}"
+                                                          styleClass="form-control #{!component.valid ? 'is-invalid' : ''}">
+                                            <f:selectItem itemValue="1" itemLabel="1"/>
+                                            <f:selectItem itemValue="2" itemLabel="2"/>
+                                            <f:selectItem itemValue="3" itemLabel="3"/>
+                                            <f:selectItem itemValue="4" itemLabel="4"/>
+                                            <f:selectItem itemValue="5" itemLabel="5"/>
+                                        </h:selectOneRadio>
+                                        <div class="invalid-feedback">
+                                            <h:message for="score"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="review">Review</label>
+                                        <h:inputTextarea id="review" styleClass="form-control" rows="3"
+                                                         value="#{ratingController.review}"/>
+                                    </div>
+                                    <h:commandButton action="#{ratingController.rateMovie}" id="submit"
+                                                     styleClass="btn btn-primary" value="Submit">
+                                        <f:param name="id" value="#{ratingController.movieId}"/>
+                                        <f:param name="editing" value="true"/>
+                                    </h:commandButton>
+                                </h:form>
+                            </div>
+                        </div>
+                    </c:if>
+                </sec:authenticated>
+                <div>
+                    <ui:repeat value="#{ratingController.findAllRatings(movie.id)}" var="rating">
+                        <!--@elvariable id="rating" type="no.asmadsen.exam.entity.Rating"-->
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <h6 class="card-title">Rating: #{rating.rating}/5</h6>
+                                <p class="card-body overflow-auto" style="max-height: 200px;">#{rating.review}</p>
+                                <sec:authenticated>
+                                    <h:link id="changeRatingBtn"
+                                            rendered="#{rating.id.userId.equals(userController.userId)}"
+                                            action="/movie.jsf?faces-redirect=false" includeViewParams="true"
+                                            value="Edit rating" styleClass="btn btn-primary changeRatingBtn">
+                                        <f:param name="editing" value="#{true}"/>
+                                    </h:link>
+                                </sec:authenticated>
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </ui:fragment>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

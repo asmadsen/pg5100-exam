@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:sec="http://www.springframework.org/security/tags" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="en"
+      lang="en">
+<ui:composition template="../partials/layout.xhtml">
+    <ui:define name="title">Home</ui:define>
+    <ui:define name="fullwidth">
+        <f:metadata>
+            <f:viewParam name="genres" value="#{movieController.urlGenres}" />
+        </f:metadata>
+        <div class="jumbotron">
+            <h1 class="display-4">Movies</h1>
+            <sec:authenticated>
+                <p class="lead">Welcome #{userController.userAlias}</p>
+            </sec:authenticated>
+        </div>
+        <div class="container">
+            <script>
+                function updateValue(e) {
+                    const target = document.getElementById("genresCSV")
+                    let values = target.value.split(',').filter(entry => entry.trim() !== '')
+                    if (e.checked) {
+                        target.value = [...values, e.value].join(',')
+                    } else {
+                        target.value = values.filter(entry => entry !== e.value).join(',')
+                    }
+                    document.getElementById('filterForm').submit()
+                }
+            </script>
+            <form id="filterForm">
+                <ui:repeat value="#{movieController.allGenres}" var="genre">
+                    <div class="form-check-inline">
+                        <input type="checkbox" id="genre-#{genre}" value="#{genre}"
+                               onchange="updateValue(this)" checked="${movieController.genreIsChecked(genre) ? 'checked' : ''}"
+                               class="form-check-input genre-checkbox"/>
+                        <label class="form-check-label" for="genre-#{genre}">#{genre}</label>
+                    </div>
+                </ui:repeat>
+                <input type="hidden" id="genresCSV" name="genres" value="#{movieController.urlGenres}"/>
+            </form>
+
+
+            <ui:repeat value="#{movieController.findAll()}" var="row">
+                <div class="row align-items-stretch my-4">
+                    <ui:repeat value="#{row}" var="movie">
+                        <div class="col-sm-4">
+                            <ui:include src="../partials/movie-card.xhtml">
+                                <ui:param name="movie" value="#{movie}"/>
+                            </ui:include>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </ui:repeat>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

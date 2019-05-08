@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jsp/jstl/core" xml:lang="en" lang="en">
+<ui:composition template="../partials/layout.xhtml">
+    <ui:define name="title">Sign up</ui:define>
+    <ui:define name="content">
+        <h:form prependId="false">
+            <legend>Sign Up</legend>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="email">Email</label>
+                    <h:inputText type="email" id="email" styleClass="form-control" value="#{signUpController.email}" />
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="alias">Alias</label>
+                    <h:inputText id="alias" styleClass="form-control" value="#{signUpController.alias}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="firstName">Firstname</label>
+                    <h:inputText id="firstName" styleClass="form-control" value="#{signUpController.firstName}" />
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="lastName">Lastname</label>
+                    <h:inputText id="lastName" styleClass="form-control" value="#{signUpController.lastName}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="password">Password</label>
+                    <h:inputSecret id="password" styleClass="form-control" value="#{signUpController.password}" />
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="confirmPassword">Confirm password</label>
+                    <h:inputSecret id="confirmPassword" styleClass="form-control" value="#{signUpController.confirmPassword}" />
+                </div>
+            </div>
+
+            <c:if test="${!empty param['error']}">
+                <div class="alert alert-danger">
+                    Email/password are wrong
+                </div>
+            </c:if>
+
+            <div class="row align-items-baseline justify-content-center">
+                <h:commandButton id="submit" action="#{signUpController.signUpUser}" styleClass="btn btn-primary" value="Sign Up" />
+                <h:link outcome="/login.jsf" styleClass="ml-2" value="Log in" />
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>
